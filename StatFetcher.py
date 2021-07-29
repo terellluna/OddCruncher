@@ -1,4 +1,5 @@
 import statsapi
+import BaseballPlayer
 
 class StatFetcher:
 
@@ -8,15 +9,12 @@ class StatFetcher:
         return statsapi.player_stats(myPlayer[0]['id'], 'hitting', 'season')
 
     def getTeamRoster(team):
+        roster = []
+
         myTeam = statsapi.lookup_team(team)
 
         teamString = statsapi.roster(myTeam[0]['id'])
 
-        #for team in myTeam:
-        #    print(team)
-
-        # will have to parse the text to return individual player names
-        # create array for home/away team based on player names
         # create dict/enum of mlb teams for lookup
         # use getPlayerStats and array of names to look up stats for entire roster
         # on gameday, use projected pitcher to fetch pitcher data
@@ -26,10 +24,10 @@ class StatFetcher:
         players = teamString.splitlines()
 
         for player in players:
-            players[players.index(player)] = player[9:]
+            roster.append(BaseballPlayer.BaseballPlayer(player[9:],player[5:7].strip(' ')))
 
-        return players
+        return roster
 
 team1 = StatFetcher.getTeamRoster('Yankees')
-print(StatFetcher.getPlayerStats(team1[0]))
-#print(StatFetcher.getTeamRoster('White Sox'))
+print(StatFetcher.getPlayerStats(team1[0].name))
+print(team1[0].position)
