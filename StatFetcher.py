@@ -1,33 +1,31 @@
 import statsapi
 import BaseballPlayer
+import BaseballStats
 
 class StatFetcher:
 
-    def getPlayerStats(player):
+    # returns the stats for the first player found given a player name
+    def getPlayerSeasonStats(player):
         myPlayer = statsapi.lookup_player(player)
+        stats = BaseballStats.BaseballStats(statsapi.player_stats(myPlayer[0]['id'], 'hitting', 'season'),statsapi.player_stats(myPlayer[0]['id'], 'pitching', 'season'),statsapi.player_stats(myPlayer[0]['id'], 'fielding', 'season'))
         
-        return statsapi.player_stats(myPlayer[0]['id'], 'hitting', 'season')
+        return stats
 
+    # returns a list of player's names, their position, and their stats
     def getTeamRoster(team):
         roster = []
 
-        myTeam = statsapi.lookup_team(team)
+        searchedTeam = statsapi.lookup_team(team)
 
-        teamString = statsapi.roster(myTeam[0]['id'])
+        teamRosterAsString = statsapi.roster(searchedTeam[0]['id'])
 
-        # create dict/enum of mlb teams for lookup
-        # use getPlayerStats and array of names to look up stats for entire roster
-        # on gameday, use projected pitcher to fetch pitcher data
-        # find a way to fetch previous day's game data to determine available releivers
+        players = teamRosterAsString.splitlines()
 
-        #turn team string into a list of players
-        players = teamString.splitlines()
-
+        # for each player, add that player's name, player's positon, and player's stats to the roster
         for player in players:
-            roster.append(BaseballPlayer.BaseballPlayer(player[9:],player[5:7].strip(' ')))
+            roster.append(BaseballPlayer.BaseballPlayer(player[9:],player[5:7].strip(' '),StatFetcher.getPlayerSeasonStats(player[9:])))
 
         return roster
 
 team1 = StatFetcher.getTeamRoster('Yankees')
-print(StatFetcher.getPlayerStats(team1[0].name))
-print(team1[0].position)
+print(team1[0].stats.fielding)
