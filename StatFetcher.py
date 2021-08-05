@@ -11,6 +11,12 @@ class StatFetcher:
         
         return stats
 
+    def getPlayerCareerStats(player):
+        myPlayer = statsapi.lookup_player(player)
+        stats = BaseballStats.BaseballStats(statsapi.player_stats(myPlayer[0]['id'], 'hitting', 'career'),statsapi.player_stats(myPlayer[0]['id'], 'pitching', 'career'),statsapi.player_stats(myPlayer[0]['id'], 'fielding', 'career'))
+        
+        return stats
+
     # returns a list of player's names, their position, and their stats
     def getTeamRoster(team):
         roster = []
